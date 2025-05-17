@@ -5,11 +5,9 @@ import { useAuth } from '../provider/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-
 const RegistreForm = () => {
   const { setToken } = useAuth();
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -18,7 +16,6 @@ const RegistreForm = () => {
     number: '',
     role: '',
   });
-
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,7 +35,7 @@ const RegistreForm = () => {
       newErrors.email = 'Ce champ est obligatoire';
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Format d’email invalide';
+      newErrors.email = 'Format demail invalide';
       isValid = false;
     }
 
@@ -86,24 +83,29 @@ const RegistreForm = () => {
       setLoading(true);
 
       try {
+        // Register the user (creates account but marks as unverified)
+        // This already sends the verification code during registration
         const response = await axios.post('http://127.0.0.1:3000/api/auth/register', formData, {
           headers: { 'Content-Type': 'application/json' },
         });
 
         if (response.status === 201) {
+          // No need to send verification code separately as it's handled by the register endpoint
+          toast.success("Inscription réussie ! Vérifiez votre email pour continuer.", {duration: 3000});
           
-          const { token } = response.data;
-          if (token) setToken(token);
-
-          toast.success("Inscription réussie ! Redirection en cours... ", {duration: 2000})
           setTimeout(() => {
-            navigate('/');
-          }, 2000);
+            navigate('/verification', { 
+              state: { email: formData.email },
+              search: `?email=${encodeURIComponent(formData.email)}`
+            });
+          }, 1000);
         } else {
           setErrors({ ...errors, general: response.data.message || 'Une erreur est survenue' });
         }
       } catch (error) {
-        setErrors({ ...errors, general: error.response?.data?.message || 'Une erreur est survenue lors de l\'inscription' });
+        const errorMessage = error.response?.data?.message || 'Une erreur est survenue lors de l\'inscription';
+        setErrors({ ...errors, general: errorMessage });
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -236,7 +238,7 @@ const RegistreForm = () => {
               className={`w-full text-white p-2 rounded-lg ${loading ? 'bg-gray-500' : 'bg-[rgb(161,193,129)] hover:bg-[rgb(118,189,47)]'}`}
               disabled={loading}
             >
-              {loading ? 'Inscription...' : 'S’inscrire'}
+              {loading ? 'Inscription...' : 'Sinscrire'}
             </button>
           </form>
         </div>

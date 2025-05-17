@@ -6,6 +6,7 @@ import Logout from "../components/Logout";
 import RegistreForm from "../components/Registre";
 import LoginForm from "../components/Login";
 import RedirectIfAuth from './RedirectIfAuth';
+import Verification from "../components/Verification";
 
 const Routes = () => {
   const { token } = useAuth();
@@ -23,6 +24,10 @@ const Routes = () => {
         {
           path: "/registre",
           element: <RegistreForm />,
+        },
+        {
+          path: "/verification",
+          element: <Verification />,
         },
       ],
     },
