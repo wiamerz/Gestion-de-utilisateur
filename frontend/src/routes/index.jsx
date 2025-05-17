@@ -1,12 +1,13 @@
 import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
 import { useAuth } from "../provider/AuthProvider";
 import { ProtectedRoute } from "./ProtectedRoute";
-import Profile from "../components/Profile";
+import Home from "../components/home";
 import Logout from "../components/Logout";
 import RegistreForm from "../components/Registre";
 import LoginForm from "../components/Login";
 import RedirectIfAuth from './RedirectIfAuth';
 import Verification from "../components/Verification";
+import Profile from "../components/Profile";
 
 const Routes = () => {
   const { token } = useAuth();
@@ -40,6 +41,10 @@ const Routes = () => {
       element: <ProtectedRoute />,
       children: [
         {
+          path: "/home",
+          element: <Home />,
+        },
+        {
           path: "/profile",
           element: <Profile />,
         },
@@ -54,7 +59,7 @@ const Routes = () => {
   // Root redirect depending on token
   const defaultRoute = {
     path: "/",
-    element: token ? <Navigate to="/profile" /> : <Navigate to="/login" />,
+    element: token ? <Navigate to="/home" /> : <Navigate to="/login" />,
   };
 
   const router = createBrowserRouter([

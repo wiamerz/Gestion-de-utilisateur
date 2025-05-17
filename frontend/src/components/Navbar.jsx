@@ -42,7 +42,7 @@ const Navbar = () => {
     <nav className="bg-[rgb(161,193,129)] p-4 shadow-lg text-black">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-3">
-          <Link to="/profile" className="text-2xl font-bold">
+          <Link to="/home" className="text-2xl font-bold">
             L9fol
           </Link>
         </div>

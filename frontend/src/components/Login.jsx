@@ -71,7 +71,7 @@ const LoginForm = () => {
           toast.success("connexion réussie ", {duration: 2000})
           setTimeout(() => {
             
-            navigate('/profile');
+            navigate('/home');
           }, 3000);
         }
       } catch (error) {
