@@ -117,6 +117,10 @@ const LoginForm = () => {
             {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
 
+          
+         <a href="/password" className="text-[rgb(254,199,116)] flex justify-center items-center">Mot de passe oublie?</a>
+        
+  
           <button type="submit" className="w-full bg-[rgb(161,193,129)] hover:bg-[rgb(118,189,47)] text-white p-2 rounded-lg">
             Se connecter
           </button>

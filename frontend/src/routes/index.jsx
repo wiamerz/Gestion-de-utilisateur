@@ -8,6 +8,7 @@ import LoginForm from "../components/Login";
 import RedirectIfAuth from "./RedirectIfAuth";
 import Verification from "../components/Verification";
 import Profile from "../components/Profile";
+import Password from "../components/Password"
 
 const Routes = () => {
   const { token } = useAuth();
@@ -53,6 +54,10 @@ const Routes = () => {
         {
           path: "login",
           element: <LoginForm />,
+        },
+        {
+          path: "password",
+          element: <Password />,
         },
         {
           path: "registre",

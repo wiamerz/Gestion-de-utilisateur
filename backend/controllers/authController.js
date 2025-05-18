@@ -356,4 +356,24 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login, verifyEmail, resendVerificationCode, editProfile};
+
+//reset-password
+const resetpassword = async (req, res) => {
+  const { token, password } = req.body;
+  const user = await User.findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() }
+  });
+
+  if (!user) return res.status(400).json({ message: "Token invalide ou expiré" });
+
+  user.password = hashPassword(password); // hash le mot de passe
+  user.resetToken = null;
+  user.resetTokenExpiration = null;
+  await user.save();
+
+  res.json({ message: "Mot de passe mis à jour" });
+};
+
+
+module.exports = { register, login, verifyEmail, resendVerificationCode, editProfile, resetpassword};
