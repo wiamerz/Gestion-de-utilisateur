@@ -83,14 +83,12 @@ const RegistreForm = () => {
       setLoading(true);
 
       try {
-        // Register the user (creates account but marks as unverified)
-        // This already sends the verification code during registration
+        
         const response = await axios.post('http://127.0.0.1:3000/api/auth/register', formData, {
           headers: { 'Content-Type': 'application/json' },
         });
 
         if (response.status === 201) {
-          // No need to send verification code separately as it's handled by the register endpoint
           toast.success("Inscription réussie ! Vérifiez votre email pour continuer.", {duration: 3000});
           
           setTimeout(() => {

@@ -5,67 +5,63 @@ import Home from "../components/home";
 import Logout from "../components/Logout";
 import RegistreForm from "../components/Registre";
 import LoginForm from "../components/Login";
-import RedirectIfAuth from './RedirectIfAuth';
+import RedirectIfAuth from "./RedirectIfAuth";
 import Verification from "../components/Verification";
 import Profile from "../components/Profile";
 
 const Routes = () => {
   const { token } = useAuth();
 
-  // Routes only for non-authenticated users
-  const routesForNotAuthenticatedOnly = [
+  const router = createBrowserRouter([
+    // Accessible par tout le monde
+    {
+      path: "/verification",
+      element: <Verification />,
+    },
+
+    // Redirection racine
     {
       path: "/",
-      element: <RedirectIfAuth />,
-      children: [
-        {
-          path: "/login",
-          element: <LoginForm />,
-        },
-        {
-          path: "/registre",
-          element: <RegistreForm />,
-        },
-        {
-          path: "/verification",
-          element: <Verification />,
-        },
-      ],
+      element: token ? <Navigate to="/home" /> : <Navigate to="/login" />,
     },
-  ];
 
-  // Routes only for authenticated users
-  const routesForAuthenticatedOnly = [
+    // Routes authentifiées
     {
       path: "/",
       element: <ProtectedRoute />,
       children: [
         {
-          path: "/home",
+          path: "home",
           element: <Home />,
         },
         {
-          path: "/profile",
+          path: "profile",
           element: <Profile />,
         },
         {
-          path: "/logout",
+          path: "logout",
           element: <Logout />,
         },
       ],
     },
-  ];
 
-  // Root redirect depending on token
-  const defaultRoute = {
-    path: "/",
-    element: token ? <Navigate to="/home" /> : <Navigate to="/login" />,
-  };
+    // Routes non-authentifiées
+    {
+      path: "/",
+      element: <RedirectIfAuth />,
+      children: [
+        {
+          path: "login",
+          element: <LoginForm />,
+        },
+        {
+          path: "registre",
+          element: <RegistreForm />,
+        },
+      ],
+    },
 
-  const router = createBrowserRouter([
-    defaultRoute,
-    ...routesForNotAuthenticatedOnly,
-    ...routesForAuthenticatedOnly,
+    // Page 404
     {
       path: "*",
       element: <div className="text-center p-10 text-red-600">404 - Page non trouvée</div>,

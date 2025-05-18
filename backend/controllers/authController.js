@@ -197,8 +197,111 @@ const resendVerificationCode = async (req, res) => {
   }
 };
 
+/////////////////////////////////////////////////////////////
 
 
+
+// Edit profile route 
+const editProfile = async (req, res) => {
+  try {
+    const { userId, username, email, number, emailChanged } = req.body;
+    
+    if (!userId || !username || !email || !number) {
+      return res.status(400).json({ message: 'Tous les champs sont requis' });
+    }
+    
+    // Vérifier que l'utilisateur existe
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+    
+    // Vérifier si l'email a changé et s'il n'est pas déjà utilisé par un autre utilisateur
+    if (email !== user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser && existingUser._id.toString() !== userId) {
+        return res.status(400).json({ message: 'Cet email est déjà utilisé par un autre compte' });
+      }
+    }
+    
+    // Mise à jour conditionnelle selon si l'email a changé
+    const updateData = {
+      username,
+      number,
+      email
+    };
+    
+    // Si l'email a changé, marquer comme non vérifié et envoyer un code de vérification
+    if (emailChanged && email !== user.email) {
+      updateData.isVerified = false;
+      
+      // Mettre à jour l'utilisateur avec le nouvel email non vérifié
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        updateData,
+        { new: true }
+      );
+      
+      // Envoyer un code de vérification pour le nouvel email
+      try {
+        await sendVerificationCode(email);
+        return res.status(200).json({
+          message: 'Profil mis à jour. Veuillez vérifier votre nouvel email.',
+          user: {
+            id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            number: updatedUser.number,
+            isVerified: updatedUser.isVerified,
+            role: updatedUser.role
+          },
+          needsVerification: true
+        });
+      } catch (emailError) {
+        console.error('Erreur lors de l\'envoi du code de vérification:', emailError);
+        return res.status(200).json({
+          message: 'Profil mis à jour, mais impossible d\'envoyer l\'email de vérification.',
+          user: {
+            id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            number: updatedUser.number,
+            isVerified: updatedUser.isVerified,
+            role: updatedUser.role
+          },
+          needsVerification: true
+        });
+      }
+    } else {
+      // Mise à jour normale sans changement d'email ou sans besoin de vérification
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        updateData,
+        { new: true }
+      );
+      
+      return res.status(200).json({
+        message: 'Profil mis à jour avec succès',
+        user: {
+          id: updatedUser._id,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          number: updatedUser.number,
+          isVerified: updatedUser.isVerified,
+          role: updatedUser.role
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du profil:', error);
+    res.status(500).json({ message: 'Erreur serveur, veuillez réessayer plus tard' });
+  }
+};
+
+
+
+
+/////////////////////////////////////////////////////////////
 
 // Login function
 const login = async (req, res) => {
@@ -253,4 +356,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login, verifyEmail, resendVerificationCode};
+module.exports = { register, login, verifyEmail, resendVerificationCode, editProfile};
